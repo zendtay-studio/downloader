@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" id="themeColorMeta" content="#1a1d24">
+    <title>Video Downloader - TikTok & Instagram</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #f5f7fa;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #e8ecf2;
+            --text-primary: #2c3e50;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.1);
+            --tiktok-bg: #d4e8ed;
+            --tiktok-hover: #c2dce3;
+            --tiktok-text: #3d7a8c;
+            --instagram-bg: #f0d9e4;
+            --instagram-hover: #e6c9d8;
+            --instagram-text: #8c5a73;
+            --success-bg: #d4edda;
+            --success-text: #2d6a4f;
+            --error-bg: #f8d7da;
+            --error-text: #a94442;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #1a1d24;
+            --bg-secondary: #22262f;
+            --bg-tertiary: #2a2f3a;
+            --text-primary: #e8ecf2;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            --border-color: #374151;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.2);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.3);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.4);
+            --tiktok-bg: #2d4a52;
+            --tiktok-hover: #3a5d67;
+            --tiktok-text: #a8d4e0;
+            --instagram-bg: #4a2d3d;
+            --instagram-hover: #5d3a4d;
+            --instagram-text: #e0a8c4;
+            --success-bg: #1e4035;
+            --success-text: #86efac;
+            --error-bg: #4a2d2d;
+            --error-text: #fca5a5;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            transition: background 0.3s ease, color 0.3s ease;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 460px;
+            margin: 0 auto;
+            padding: 24px 20px;
+            min-height: 100vh;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 32px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--tiktok-bg), var(--instagram-bg));
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .logo-icon svg {
+            width: 22px;
+            height: 22px;
+            color: var(--text-primary);
+        }
+
+        .logo-text h1 {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.3px;
+        }
+
+        .logo-text span {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .theme-toggle {
+            width: 42px;
+            height: 42px;
+            border-radius: var(--radius-md);
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .theme-toggle:hover {
+            background: var(--bg-tertiary);
+            transform: scale(1.02);
+        }
+
+        .theme-toggle svg {
+            width: 20px;
+            height: 20px;
+            color: var(--text-secondary);
+        }
+
+        .platform-selector {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .platform-btn {
+            flex: 1;
+            padding: 14px 18px;
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            background: var(--bg-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .platform-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .platform-btn.tiktok.active {
+            background: var(--tiktok-bg);
+            border-color: var(--tiktok-bg);
+            color: var(--tiktok-text);
+        }
+
+        .platform-btn.instagram.active {
+            background: var(--instagram-bg);
+            border-color: var(--instagram-bg);
+            color: var(--instagram-text);
+        }
+
+        .platform-btn:hover:not(.active) {
+            border-color: var(--text-muted);
+            background: var(--bg-tertiary);
+        }
+
+        .input-card {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-xl);
+            padding: 24px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 16px 52px 16px 18px;
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-size: 15px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--text-muted);
+            box-shadow: 0 0 0 3px rgba(100, 116, 139, 0.1);
+        }
+
+        .input-group input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .paste-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 38px;
+            height: 38px;
+            border: none;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .paste-btn:hover {
+            background: var(--border-color);
+        }
+
+        .paste-btn svg {
+            width: 18px;
+            height: 18px;
+            color: var(--text-secondary);
+        }
+
+        .download-btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .download-btn.tiktok {
+            background: var(--tiktok-bg);
+            color: var(--tiktok-text);
+        }
+
+        .download-btn.tiktok:hover {
+            background: var(--tiktok-hover);
+            transform: translateY(-1px);
+        }
+
+        .download-btn.instagram {
+            background: var(--instagram-bg);
+            color: var(--instagram-text);
+        }
+
+        .download-btn.instagram:hover {
+            background: var(--instagram-hover);
+            transform: translateY(-1px);
+        }
+
+        .download-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .download-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .feature-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 18px 14px;
+            text-align: center;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .feature-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: var(--radius-sm);
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+        }
+
+        .feature-icon svg {
+            width: 20px;
+            height: 20px;
+            color: var(--text-secondary);
+        }
+
+        .feature-card h3 {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .feature-card p {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .loading {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 48px;
+        }
+
+        .loading.active {
+            display: flex;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border-color);
+            border-top-color: var(--text-secondary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading p {
+            margin-top: 16px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .result-section {
+            display: none;
+            background: var(--bg-secondary);
+            border-radius: var(--radius-xl);
+            padding: 20px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            margin-bottom: 24px;
+            animation: slideUp 0.3s ease;
+        }
+
+        .result-section.active {
+            display: block;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .result-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .result-title svg {
+            width: 20px;
+            height: 20px;
+            color: var(--success-text);
+        }
+
+        .close-btn {
+            width: 34px;
+            height: 34px;
+            border: none;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .close-btn:hover {
+            background: var(--border-color);
+        }
+
+        .close-btn svg {
+            width: 16px;
+            height: 16px;
+            color: var(--text-secondary);
+        }
+
+        .video-preview {
+            position: relative;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            background: var(--bg-primary);
+            margin-bottom: 16px;
+        }
+
+        .video-preview video {
+            width: 100%;
+            max-height: 380px;
+            object-fit: contain;
+            display: block;
+        }
+
+        .image-gallery {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .gallery-item {
+            position: relative;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            aspect-ratio: 1;
+            background: var(--bg-primary);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.2s ease;
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.04);
+        }
+
+        .gallery-item .download-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .gallery-item:hover .download-overlay {
+            opacity: 1;
+        }
+
+        .gallery-item .download-overlay button {
+            padding: 10px 16px;
+            background: var(--bg-secondary);
+            border: none;
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .gallery-item .download-overlay button svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            flex: 1;
+            min-width: 140px;
+            padding: 14px;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .action-btn.primary {
+            background: var(--tiktok-bg);
+            color: var(--tiktok-text);
+        }
+
+        .action-btn.primary.instagram {
+            background: var(--instagram-bg);
+            color: var(--instagram-text);
+        }
+
+        .action-btn.secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .action-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            padding: 14px 24px;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success {
+            background: var(--success-bg);
+            color: var(--success-text);
+        }
+
+        .toast.error {
+            background: var(--error-bg);
+            color: var(--error-text);
+        }
+
+        .toast svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 24px 20px;
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        @media (max-width: 400px) {
+            .container {
+                padding: 20px 16px;
+            }
+            
+            .features {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .feature-card:last-child {
+                grid-column: span 2;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .action-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                </div>
+                <div class="logo-text">
+                    <h1>Video Downloader</h1>
+                    <span>TikTok & Instagram</span>
+                </div>
+            </div>
+            <button class="theme-toggle" id="themeToggle" title="Cambiar tema">
+                <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="5"/>
+                    <line x1="12" y1="1" x2="12" y2="3"/>
+                    <line x1="12" y1="21" x2="12" y2="23"/>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                    <line x1="1" y1="12" x2="3" y2="12"/>
+                    <line x1="21" y1="12" x2="23" y2="12"/>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                </svg>
+                <svg class="moon-icon" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                </svg>
+            </button>
+        </header>
+
+        <div class="platform-selector">
+            <button class="platform-btn tiktok active" data-platform="tiktok">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+                </svg>
+                TikTok
+            </button>
+            <button class="platform-btn instagram" data-platform="instagram">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+                </svg>
+                Instagram
+            </button>
+        </div>
+
+        <div class="input-card">
+            <div class="input-group">
+                <input type="text" id="urlInput" placeholder="Pega el enlace del video aqui...">
+                <button class="paste-btn" id="pasteBtn" title="Pegar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+                        <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+                    </svg>
+                </button>
+            </div>
+            <button class="download-btn tiktok" id="downloadBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"/>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                Buscar Contenido
+            </button>
+        </div>
+
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="23 7 16 12 23 17 23 7"/>
+                        <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+                    </svg>
+                </div>
+                <h3>Videos HD</h3>
+                <p>Sin marca de agua</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                        <circle cx="8.5" cy="8.5" r="1.5"/>
+                        <polyline points="21 15 16 10 5 21"/>
+                    </svg>
+                </div>
+                <h3>Imagenes</h3>
+                <p>Fotos y slideshows</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 18V5l12-2v13"/>
+                        <circle cx="6" cy="18" r="3"/>
+                        <circle cx="18" cy="16" r="3"/>
+                    </svg>
+                </div>
+                <h3>Audio</h3>
+                <p>Solo musica MP3</p>
+            </div>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Procesando contenido...</p>
+        </div>
+
+        <div class="result-section" id="resultSection">
+            <div class="result-header">
+                <div class="result-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                        <polyline points="22 4 12 14.01 9 11.01"/>
+                    </svg>
+                    Contenido Encontrado
+                </div>
+                <button class="close-btn" id="closeResult">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="video-preview" id="videoPreview" style="display:none">
+                <video id="videoPlayer" controls></video>
+            </div>
+            
+            <div class="image-gallery" id="imageGallery"></div>
+            
+            <div class="action-buttons" id="actionButtons"></div>
+        </div>
+
+        <footer class="footer">
+            <p>Descarga videos de TikTok e Instagram de forma rapida y sencilla</p>
+        </footer>
+    </div>
+
+    <div class="toast" id="toast">
+        <svg class="toast-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
+        <span class="toast-message"></span>
+    </div>
+
+    <script>
+        const API_BASE = 'https://zendtay.qzz.io/dow';
+        
+        let currentPlatform = 'tiktok';
+        let currentTheme = 'dark';
+
+        const urlInput = document.getElementById('urlInput');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const pasteBtn = document.getElementById('pasteBtn');
+        const loading = document.getElementById('loading');
+        const resultSection = document.getElementById('resultSection');
+        const videoPreview = document.getElementById('videoPreview');
+        const videoPlayer = document.getElementById('videoPlayer');
+        const imageGallery = document.getElementById('imageGallery');
+        const actionButtons = document.getElementById('actionButtons');
+        const closeResult = document.getElementById('closeResult');
+        const themeToggle = document.getElementById('themeToggle');
+        const platformBtns = document.querySelectorAll('.platform-btn');
+        const themeColorMeta = document.getElementById('themeColorMeta');
+
+        function updateThemeColor() {
+            const bgPrimary = getComputedStyle(document.documentElement).getPropertyValue('--bg-primary').trim();
+            themeColorMeta.setAttribute('content', currentTheme === 'dark' ? '#1a1d24' : '#f5f7fa');
+        }
+
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                currentTheme = 'light';
+            } else {
+                currentTheme = 'dark';
+            }
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            updateThemeIcon();
+            updateThemeColor();
+        }
+
+        function updateThemeIcon() {
+            const sunIcon = themeToggle.querySelector('.sun-icon');
+            const moonIcon = themeToggle.querySelector('.moon-icon');
+            if (currentTheme === 'dark') {
+                sunIcon.style.display = 'none';
+                moonIcon.style.display = 'block';
+            } else {
+                sunIcon.style.display = 'block';
+                moonIcon.style.display = 'none';
+            }
+        }
+
+        themeToggle.addEventListener('click', () => {
+            currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            localStorage.setItem('theme', currentTheme);
+            updateThemeIcon();
+            updateThemeColor();
+        });
+
+        platformBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                platformBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentPlatform = btn.dataset.platform;
+                updateDownloadButton();
+            });
+        });
+
+        function updateDownloadButton() {
+            downloadBtn.className = `download-btn ${currentPlatform}`;
+        }
+
+        urlInput.addEventListener('input', () => {
+            const url = urlInput.value.toLowerCase();
+            if (url.includes('tiktok')) {
+                setActivePlatform('tiktok');
+            } else if (url.includes('instagram')) {
+                setActivePlatform('instagram');
+            }
+        });
+
+        function setActivePlatform(platform) {
+            currentPlatform = platform;
+            platformBtns.forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.platform === platform);
+            });
+            updateDownloadButton();
+        }
+
+        pasteBtn.addEventListener('click', async () => {
+            try {
+                const text = await navigator.clipboard.readText();
+                urlInput.value = text;
+                urlInput.dispatchEvent(new Event('input'));
+                showToast('Enlace pegado', 'success');
+            } catch (err) {
+                showToast('No se pudo acceder al portapapeles', 'error');
+            }
+        });
+
+        downloadBtn.addEventListener('click', fetchContent);
+
+        urlInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                fetchContent();
+            }
+        });
+
+        async function fetchContent() {
+            const url = urlInput.value.trim();
+            if (!url) {
+                showToast('Por favor ingresa un enlace', 'error');
+                return;
+            }
+
+            if (!isValidUrl(url)) {
+                showToast(`Enlace no valido para ${currentPlatform === 'tiktok' ? 'TikTok' : 'Instagram'}`, 'error');
+                return;
+            }
+
+            showLoading(true);
+            hideResult();
+
+            try {
+                const endpoint = currentPlatform === 'tiktok' 
+                    ? `${API_BASE}/tt?url=${encodeURIComponent(url)}`
+                    : `${API_BASE}/ig?url=${encodeURIComponent(url)}`;
+
+                const response = await fetch(endpoint);
+                const result = await response.json();
+
+                if (!result.success) {
+                    throw new Error(result.message || 'Error al procesar el enlace');
+                }
+
+                displayResult(result.data);
+                showToast('Contenido encontrado', 'success');
+            } catch (error) {
+                console.error('Error:', error);
+                showToast(error.message || 'Error al procesar el enlace', 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function isValidUrl(url) {
+            if (currentPlatform === 'tiktok') {
+                return url.includes('tiktok.com') || url.includes('vt.tiktok.com');
+            } else {
+                return url.includes('instagram.com');
+            }
+        }
+
+        function displayResult(data) {
+            imageGallery.innerHTML = '';
+            actionButtons.innerHTML = '';
+            videoPreview.style.display = 'none';
+
+            if (currentPlatform === 'tiktok') {
+                displayTikTokResult(data);
+            } else {
+                displayInstagramResult(data);
+            }
+
+            resultSection.classList.add('active');
+        }
+
+        function displayTikTokResult(data) {
+            if (data.images && data.images.length > 0) {
+                const imageUrls = data.images.map(img => img.url || img);
+                displayImages(imageUrls);
+                if (imageUrls.length > 1) {
+                    addDownloadAllButton(imageUrls, 'Descargar Todas las Imágenes');
+                }
+            } else if (data.video) {
+                videoPlayer.src = data.video;
+                videoPreview.style.display = 'block';
+                addActionButton('Descargar Video', data.video, 'primary');
+            }
+
+            if (data.audio) {
+                addActionButton('Descargar Audio', data.audio, 'secondary');
+            }
+        }
+
+        function displayInstagramResult(data) {
+            if (data.medias && data.medias.length > 0) {
+                const images = data.medias.filter(m => m.type === 'image');
+                const videos = data.medias.filter(m => m.type === 'video');
+
+                if (videos.length > 0) {
+                    videoPlayer.src = videos[0].url;
+                    videoPreview.style.display = 'block';
+                    addActionButton('Descargar Video', videos[0].url, 'primary instagram');
+                }
+
+                if (images.length > 0) {
+                    displayImages(images.map(i => i.url));
+                    if (images.length > 1) {
+                        addDownloadAllButton(images.map(i => i.url), 'Descargar Todas las Imágenes');
+                    }
+                }
+            } else if (data.video) {
+                videoPlayer.src = data.video;
+                videoPreview.style.display = 'block';
+                addActionButton('Descargar Video', data.video, 'primary instagram');
+            } else if (data.images && data.images.length > 0) {
+                const imageUrls = data.images.map(img => img.url || img);
+                displayImages(imageUrls);
+                if (imageUrls.length > 1) {
+                    addDownloadAllButton(imageUrls, 'Descargar Todas las Imágenes');
+                }
+            } else if (data.image) {
+                displayImages([data.image]);
+                addActionButton('Descargar Imagen', data.image, 'primary instagram');
+            }
+        }
+
+        function displayImages(images) {
+            images.forEach((img, index) => {
+                const item = document.createElement('div');
+                item.className = 'gallery-item';
+                item.innerHTML = `
+                    <img src="${img}" alt="Imagen ${index + 1}" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22%236b7280%22%3E%3Crect width=%2224%22 height=%2224%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%239ca3af%22%3E❌%3C/text%3E%3C/svg%3E'">
+                    <div class="download-overlay">
+                        <button onclick="window.downloadFile('${img}', 'imagen_${index + 1}')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7 10 12 15 17 10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                            Descargar
+                        </button>
+                    </div>
+                `;
+                imageGallery.appendChild(item);
+            });
+        }
+
+        function addActionButton(text, url, className) {
+            const btn = document.createElement('button');
+            btn.className = `action-btn ${className}`;
+            btn.innerHTML = `
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                ${text}
+            `;
+            btn.addEventListener('click', () => downloadFile(url, text.toLowerCase().replace(/\s/g, '_')));
+            actionButtons.appendChild(btn);
+        }
+
+        function addDownloadAllButton(urls, text) {
+            const btn = document.createElement('button');
+            btn.className = `action-btn primary ${currentPlatform}`;
+            btn.innerHTML = `
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                ${text}
+            `;
+            btn.addEventListener('click', () => downloadAllFiles(urls));
+            actionButtons.appendChild(btn);
+        }
+
+        window.downloadFile = async function(url, filename) {
+            await downloadFile(url, filename);
+        };
+
+        async function downloadFile(url, filename) {
+            try {
+                showToast('Iniciando descarga...', 'success');
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Error al descargar');
+                const blob = await response.blob();
+                const blobUrl = URL.createObjectURL(blob);
+                
+                let ext = 'mp4';
+                if (blob.type.includes('video')) ext = 'mp4';
+                else if (blob.type.includes('audio')) ext = 'mp3';
+                else if (blob.type.includes('jpeg') || blob.type.includes('jpg')) ext = 'jpg';
+                else if (blob.type.includes('png')) ext = 'png';
+                else ext = 'mp4';
+                
+                const a = document.createElement('a');
+                a.href = blobUrl;
+                a.download = `${filename}.${ext}`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(blobUrl);
+                
+                showToast('Descarga completada', 'success');
+            } catch (error) {
+                console.error('Download error:', error);
+                showToast('Error al descargar el archivo', 'error');
+            }
+        }
+
+        async function downloadAllFiles(urls) {
+            showToast(`Descargando ${urls.length} archivos...`, 'success');
+            for (let i = 0; i < urls.length; i++) {
+                await downloadFile(urls[i], `imagen_${i + 1}`);
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+            showToast('Todos los archivos fueron descargados', 'success');
+        }
+
+        closeResult.addEventListener('click', hideResult);
+
+        function hideResult() {
+            resultSection.classList.remove('active');
+            videoPlayer.pause();
+            videoPlayer.src = '';
+            videoPreview.style.display = 'none';
+            imageGallery.innerHTML = '';
+            actionButtons.innerHTML = '';
+        }
+
+        function showLoading(show) {
+            loading.classList.toggle('active', show);
+        }
+
+        function showToast(message, type) {
+            const toast = document.getElementById('toast');
+            const toastIcon = toast.querySelector('.toast-icon');
+            const toastMessage = toast.querySelector('.toast-message');
+            
+            toast.className = `toast ${type}`;
+            toastMessage.textContent = message;
+            
+            if (type === 'success') {
+                toastIcon.innerHTML = '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>';
+            } else {
+                toastIcon.innerHTML = '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>';
+            }
+            
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        initTheme();
+    </script>
+</body>
+</html>
