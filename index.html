@@ -912,8 +912,8 @@
 
             try {
                 const endpoint = currentPlatform === 'tiktok' 
-                    ? `${API_BASE}/tt?url=${encodeURIComponent(url)}`
-                    : `${API_BASE}/ig?url=${encodeURIComponent(url)}`;
+                    ? `${API_BASE}/tt?url=${encodeURIComponent(url)}&cache=false`
+                    : `${API_BASE}/ig?url=${encodeURIComponent(url)}&cache=false`;
 
                 const response = await fetch(endpoint);
                 const result = await response.json();
