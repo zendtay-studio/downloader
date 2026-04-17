@@ -457,7 +457,6 @@
             color: var(--text-secondary);
         }
 
-        /* RELACIÓN DE ASPECTO AUTOMÁTICA - SOLO CAMBIÉ ESTO */
         .video-preview {
             position: relative;
             border-radius: var(--radius-md);
@@ -1213,7 +1212,7 @@
                 item.innerHTML = `
                     <img src="${img}" alt="Imagen ${index + 1}" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22%236b7280%22%3E%3Crect width=%2224%22 height=%2224%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%239ca3af%22%3E❌%3C/text%3E%3C/svg%3E'">
                     <div class="download-overlay">
-                        <button class="download-img-btn" data-url="${img}" data-index="${index + 1}">
+                        <button class="download-img-btn" data-url="${img}">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                                 <polyline points="7 10 12 15 17 10"/>
@@ -1226,13 +1225,11 @@
                 imageGallery.appendChild(item);
             });
 
-            // Agregar eventos a los botones de descarga de imágenes
             document.querySelectorAll('.download-img-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
                     const url = btn.dataset.url;
-                    const index = btn.dataset.index;
-                    downloadFile(url, `imagen_${index}`);
+                    downloadFile(url);
                 });
             });
         }
@@ -1248,7 +1245,7 @@
                 </svg>
                 ${text}
             `;
-            btn.addEventListener('click', () => downloadFile(url, text.toLowerCase().replace(/\s/g, '_')));
+            btn.addEventListener('click', () => downloadFile(url));
             actionButtons.appendChild(btn);
         }
 
@@ -1267,30 +1264,48 @@
             actionButtons.appendChild(btn);
         }
 
-        // Función de descarga CORREGIDA - sin recursión
-        async function downloadFile(url, filename) {
+        // Función de descarga SIMPLIFICADA - solo recibe la URL
+        // El nombre del archivo viene del servidor vía Content-Disposition
+        async function downloadFile(url) {
             try {
                 showToast('Iniciando descarga...', 'success');
+                
                 const response = await fetch(url);
                 if (!response.ok) throw new Error('Error al descargar');
+                
                 const blob = await response.blob();
                 const blobUrl = URL.createObjectURL(blob);
-
-                let ext = 'mp4';
-                if (blob.type.includes('video')) ext = 'mp4';
-                else if (blob.type.includes('audio')) ext = 'mp3';
-                else if (blob.type.includes('jpeg') || blob.type.includes('jpg')) ext = 'jpg';
-                else if (blob.type.includes('png')) ext = 'png';
-                else ext = 'mp4';
-
+                
+                // Extraer el nombre del archivo de la cabecera Content-Disposition
+                let filename = null;
+                const contentDisposition = response.headers.get('Content-Disposition');
+                
+                if (contentDisposition) {
+                    // Buscar filename="..." o filename=...
+                    const match = contentDisposition.match(/filename[=*]?["']?(?:UTF-8'')?([^"';]+)/i);
+                    if (match) {
+                        filename = decodeURIComponent(match[1]);
+                    }
+                }
+                
+                // Si no hay nombre del servidor, generar uno
+                if (!filename) {
+                    const timestamp = Date.now();
+                    // Intentar obtener extensión de la URL
+                    const urlPath = new URL(url).pathname;
+                    const extMatch = urlPath.match(/\.(mp4|mp3|jpg|jpeg|png|webp)$/i);
+                    const extension = extMatch ? extMatch[1] : 'mp4';
+                    filename = `${currentPlatform}_${timestamp}.${extension}`;
+                }
+                
                 const a = document.createElement('a');
                 a.href = blobUrl;
-                a.download = `${filename}.${ext}`;
+                a.download = filename;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(blobUrl);
-
+                
                 showToast('Descarga completada', 'success');
             } catch (error) {
                 console.error('Download error:', error);
@@ -1301,7 +1316,7 @@
         async function downloadAllFiles(urls) {
             showToast(`Descargando ${urls.length} archivos...`, 'success');
             for (let i = 0; i < urls.length; i++) {
-                await downloadFile(urls[i], `imagen_${i + 1}`);
+                await downloadFile(urls[i]);
                 await new Promise(resolve => setTimeout(resolve, 500));
             }
             showToast('Todos los archivos fueron descargados', 'success');
