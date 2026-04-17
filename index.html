@@ -485,6 +485,7 @@
             overflow: hidden;
             aspect-ratio: 1;
             background: var(--bg-primary);
+            cursor: pointer;
         }
 
         .gallery-item img {
@@ -1157,18 +1158,18 @@
         function displayTikTokResult(data) {
             if (data.images && data.images.length > 0) {
                 const imageUrls = data.images.map(img => img.url || img);
-                displayImages(imageUrls);
+                displayImages(imageUrls, 'image');
                 if (imageUrls.length > 1) {
-                    addDownloadAllButton(imageUrls, 'Descargar Todas las Imágenes');
+                    addDownloadAllButton(imageUrls, 'image', 'Descargar Todas las Imágenes');
                 }
             } else if (data.video) {
                 videoPlayer.src = data.video;
                 videoPreview.style.display = 'block';
-                addActionButton('Descargar Video', data.video, 'primary');
+                addActionButton('Descargar Video', data.video, 'video', 'primary');
             }
 
             if (data.audio) {
-                addActionButton('Descargar Audio', data.audio, 'secondary');
+                addActionButton('Descargar Audio', data.audio, 'audio', 'secondary');
             }
         }
 
@@ -1180,39 +1181,39 @@
                 if (videos.length > 0) {
                     videoPlayer.src = videos[0].url;
                     videoPreview.style.display = 'block';
-                    addActionButton('Descargar Video', videos[0].url, 'primary instagram');
+                    addActionButton('Descargar Video', videos[0].url, 'video', 'primary instagram');
                 }
 
                 if (images.length > 0) {
-                    displayImages(images.map(i => i.url));
+                    displayImages(images.map(i => i.url), 'image');
                     if (images.length > 1) {
-                        addDownloadAllButton(images.map(i => i.url), 'Descargar Todas las Imágenes');
+                        addDownloadAllButton(images.map(i => i.url), 'image', 'Descargar Todas las Imágenes');
                     }
                 }
             } else if (data.video) {
                 videoPlayer.src = data.video;
                 videoPreview.style.display = 'block';
-                addActionButton('Descargar Video', data.video, 'primary instagram');
+                addActionButton('Descargar Video', data.video, 'video', 'primary instagram');
             } else if (data.images && data.images.length > 0) {
                 const imageUrls = data.images.map(img => img.url || img);
-                displayImages(imageUrls);
+                displayImages(imageUrls, 'image');
                 if (imageUrls.length > 1) {
-                    addDownloadAllButton(imageUrls, 'Descargar Todas las Imágenes');
+                    addDownloadAllButton(imageUrls, 'image', 'Descargar Todas las Imágenes');
                 }
             } else if (data.image) {
-                displayImages([data.image]);
-                addActionButton('Descargar Imagen', data.image, 'primary instagram');
+                displayImages([data.image], 'image');
+                addActionButton('Descargar Imagen', data.image, 'image', 'primary instagram');
             }
         }
 
-        function displayImages(images) {
-            images.forEach((img, index) => {
+        function displayImages(images, type) {
+            images.forEach((img) => {
                 const item = document.createElement('div');
                 item.className = 'gallery-item';
                 item.innerHTML = `
-                    <img src="${img}" alt="Imagen ${index + 1}" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22%236b7280%22%3E%3Crect width=%2224%22 height=%2224%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%239ca3af%22%3E❌%3C/text%3E%3C/svg%3E'">
+                    <img src="${img}" alt="Imagen" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22%236b7280%22%3E%3Crect width=%2224%22 height=%2224%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%239ca3af%22%3E❌%3C/text%3E%3C/svg%3E'">
                     <div class="download-overlay">
-                        <button class="download-img-btn" data-url="${img}">
+                        <button class="download-img-btn" data-url="${img}" data-type="${type}">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                                 <polyline points="7 10 12 15 17 10"/>
@@ -1229,12 +1230,13 @@
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
                     const url = btn.dataset.url;
-                    downloadFile(url);
+                    const type = btn.dataset.type;
+                    downloadFile(url, type);
                 });
             });
         }
 
-        function addActionButton(text, url, className) {
+        function addActionButton(text, url, type, className) {
             const btn = document.createElement('button');
             btn.className = `action-btn ${className}`;
             btn.innerHTML = `
@@ -1245,11 +1247,11 @@
                 </svg>
                 ${text}
             `;
-            btn.addEventListener('click', () => downloadFile(url));
+            btn.addEventListener('click', () => downloadFile(url, type));
             actionButtons.appendChild(btn);
         }
 
-        function addDownloadAllButton(urls, text) {
+        function addDownloadAllButton(urls, type, text) {
             const btn = document.createElement('button');
             btn.className = `action-btn primary ${currentPlatform}`;
             btn.innerHTML = `
@@ -1260,13 +1262,22 @@
                 </svg>
                 ${text}
             `;
-            btn.addEventListener('click', () => downloadAllFiles(urls));
+            btn.addEventListener('click', () => downloadAllFiles(urls, type));
             actionButtons.appendChild(btn);
         }
 
-        // Función de descarga SIMPLIFICADA - solo recibe la URL
-        // El nombre del archivo viene del servidor vía Content-Disposition
-        async function downloadFile(url) {
+        // Función para obtener la extensión según el tipo
+        function getExtensionByType(type) {
+            switch (type) {
+                case 'video': return '.mp4';
+                case 'audio': return '.mp3';
+                case 'image': return '.jpg';
+                default: return '.mp4';
+            }
+        }
+
+        // Función de descarga con tipo explícito
+        async function downloadFile(url, type) {
             try {
                 showToast('Iniciando descarga...', 'success');
                 
@@ -1276,27 +1287,10 @@
                 const blob = await response.blob();
                 const blobUrl = URL.createObjectURL(blob);
                 
-                // Extraer el nombre del archivo de la cabecera Content-Disposition
-                let filename = null;
-                const contentDisposition = response.headers.get('Content-Disposition');
-                
-                if (contentDisposition) {
-                    // Buscar filename="..." o filename=...
-                    const match = contentDisposition.match(/filename[=*]?["']?(?:UTF-8'')?([^"';]+)/i);
-                    if (match) {
-                        filename = decodeURIComponent(match[1]);
-                    }
-                }
-                
-                // Si no hay nombre del servidor, generar uno
-                if (!filename) {
-                    const timestamp = Date.now();
-                    // Intentar obtener extensión de la URL
-                    const urlPath = new URL(url).pathname;
-                    const extMatch = urlPath.match(/\.(mp4|mp3|jpg|jpeg|png|webp)$/i);
-                    const extension = extMatch ? extMatch[1] : 'mp4';
-                    filename = `${currentPlatform}_${timestamp}.${extension}`;
-                }
+                // Generar nombre con timestamp y extensión según el tipo
+                const timestamp = Date.now();
+                const extension = getExtensionByType(type);
+                const filename = `${currentPlatform}_${timestamp}${extension}`;
                 
                 const a = document.createElement('a');
                 a.href = blobUrl;
@@ -1313,10 +1307,10 @@
             }
         }
 
-        async function downloadAllFiles(urls) {
+        async function downloadAllFiles(urls, type) {
             showToast(`Descargando ${urls.length} archivos...`, 'success');
             for (let i = 0; i < urls.length; i++) {
-                await downloadFile(urls[i]);
+                await downloadFile(urls[i], type);
                 await new Promise(resolve => setTimeout(resolve, 500));
             }
             showToast('Todos los archivos fueron descargados', 'success');
@@ -1326,8 +1320,10 @@
 
         function hideResult() {
             resultSection.classList.remove('active');
-            videoPlayer.pause();
-            videoPlayer.src = '';
+            if (videoPlayer) {
+                videoPlayer.pause();
+                videoPlayer.src = '';
+            }
             videoPreview.style.display = 'none';
             imageGallery.innerHTML = '';
             actionButtons.innerHTML = '';
