@@ -1281,24 +1281,17 @@
             try {
                 showToast('Iniciando descarga...', 'success');
                 
-                const response = await fetch(url);
-                if (!response.ok) throw new Error('Error al descargar');
-                
-                const blob = await response.blob();
-                const blobUrl = URL.createObjectURL(blob);
-                
                 // Generar nombre con timestamp y extensión según el tipo
                 const timestamp = Date.now();
                 const extension = getExtensionByType(type);
                 const filename = `${currentPlatform}_${timestamp}${extension}`;
                 
                 const a = document.createElement('a');
-                a.href = blobUrl;
+                a.href = url;
                 a.download = filename;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
-                URL.revokeObjectURL(blobUrl);
                 
                 showToast('Descarga completada', 'success');
             } catch (error) {
