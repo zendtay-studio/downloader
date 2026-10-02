@@ -1,0 +1,57 @@
+{
+  "name": "down-zty",
+  "version": "1.0.0",
+  "description": "Download videos, audio and images from 21 platforms, including TikTok, YouTube, Instagram, Facebook, X, Reddit, Pinterest and more. Paste a link, pick what you want, download it.",
+  "type": "module",
+  "main": "worker.js",
+  "exports": {
+    ".": "./worker.js",
+    "./cli": "./bin/cli.mjs",
+    "./api": "./src/api.mjs",
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "ddd": "bin/cli.mjs"
+  },
+  "files": [
+    "LICENSE",
+    "bin/",
+    "src/",
+    "worker.js",
+    "install.sh",
+    "README.md"
+  ],
+  "scripts": {
+    "start": "node tools/serve.mjs",
+    "i": "./install.sh",
+    "build": "node tools/build.mjs",
+    "test": "node tools/build.mjs && node tools/test-split.mjs && node tools/test-core.mjs && node tools/test-select.mjs && node tools/test-worker.mjs",
+    "og": "node tools/og.mjs",
+    "check": "node tools/build.mjs && node tools/test-split.mjs && node tools/imports.mjs && node tools/syntax.mjs && node tools/status.mjs && node tools/test-core.mjs && node tools/test-select.mjs && node tools/test-worker.mjs && node tools/scripts-inline.mjs && node tools/styles-inline.mjs && node tools/pwa.mjs --check && node tools/check-install.mjs && node tools/check-identity.mjs && node tools/check-zoom.mjs && node tools/og.mjs --check",
+    "prepack": "node tools/build.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zendtay-studio/downloader.git"
+  },
+  "bugs": {
+    "url": "https://github.com/zendtay-studio/downloader/issues"
+  },
+  "homepage": "https://github.com/zendtay-studio/downloader#readme",
+  "author": "zendtay-studio <192348109+zendtay-studio@users.noreply.github.com>",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "downloader",
+    "tiktok",
+    "youtube",
+    "instagram",
+    "threads",
+    "cloudflare-workers",
+    "video",
+    "audio"
+  ],
+  "private": false
+}
